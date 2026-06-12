@@ -1,0 +1,62 @@
+[package]
+name = "quant-mm-simulator-rs"
+version = "0.0.1"
+edition = "2021"
+description = "High-performance event-driven market-making simulator: L2 book + tape replay, queue-position-aware fills, continuous inventory, a microstructure quoting-model library, hedge engine, and a costed multi-leg trade ledger. Parity-validated against a reference implementation."
+license = "MIT"
+repository = "https://github.com/DaruFinance/quant-mm-simulator-rs"
+
+[dependencies]
+# Optional. Pulled when the `ingest` feature is on.
+# reads CSV-flattened L2 snapshots + tape; mirrors the carry/pairs
+# pattern in quant-research-framework-rs of "Rust reads CSV; the
+# parity script converts source parquet to CSV at runtime".
+csv = { version = "1.3", optional = true }
+
+# Pulled by the T4 corpus layer for deterministic PCG64 sampling.
+# Mirrors the framework's convention (T1/T5/T6 all use rand_pcg).
+rand = { version = "0.9", optional = true }
+rand_pcg = { version = "0.9", optional = true }
+# rayon: parallel corpus enumeration.
+rayon = "1.10"
+
+[features]
+# ingest plugin. Mirrors Python's mmsim.ingest.lob.
+ingest = ["dep:csv"]
+# sim loop. Builds on `ingest` for the EventStream
+# input.  Quoter / fills are injectable callables until the
+# quoter and fill-model contracts are formalized.
+sim = ["ingest"]
+# quoter contract. Formal Quoter trait + reference
+# implementations (ConstantQuoter, TopOfBookQuoter, BracketQuoter).
+# Required by every sim verification.
+quoter = ["sim"]
+# hedge engine.  Builds on `sim` for the shared
+# Fill record + Book.  Mirrors Python's `mmsim.hedge`.
+hedge = ["sim"]
+# quoting-model library.  Builds on `quoter` for the
+# Quoter trait and helpers (shapes, refprice, inv_penalty).  Mirrors
+# Python's `mmsim.models`.
+models = ["quoter"]
+# aux log streams.  Fill-rate / inventory /
+# queue-pos sidecar logs that ride alongside the trade ledger.
+logs = ["sim"]
+# T4 corpus generator layer — additive to the existing engine.
+# Depends on `models` (closed-form quoters), `hedge` (hedge engines),
+# and `logs` (per-fill sidecar). Pulls `rand_pcg` for PCG64 RNG to
+# match the framework's parity convention. The corpus layer composes
+# every primitive into a single Quoter implementation per
+# structural combo and drives the engine on real LOB fixtures.
+t4-corpus = ["models", "hedge", "logs", "dep:rand_pcg", "dep:rand"]
+
+[dev-dependencies]
+# pytest-equivalent landings as items mature.
+
+[lib]
+name = "quant_mm_simulator_rs"
+path = "src/lib.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

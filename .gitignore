@@ -1,0 +1,24 @@
+# Rust / Cargo
+/target
+**/*.rs.bk
+Cargo.lock
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+# Auto-generated parity-harness scaffolding
+examples/_parity_*.rs
+# Outputs / local captures
+*.log
+data/raw/
+data/captures/
+docs/baselines/_local_*
+# Python venvs used by parity scripts
+.venv/
+__pycache__/
+
+# --- Verification / findings docs (kept locally) ---
+docs/verification/
+examples/
