@@ -1,6 +1,6 @@
 # quant-mm-simulator-rs
 
-> Rust port of the simulator behind "Adverse Selection Consumes the Touch" by Daniel Gatto ([SSRN 7022599](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7022599)). Write-up: [daru.finance/research/market-making](https://www.daru.finance/research/market-making).
+> Rust port of the simulator behind "Adverse Selection Consumes the Touch" by Daniel Gatto ([SSRN 7022599](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7022599)). Write-up: [daru.finance/research/market-making](https://daru.finance/research/market-making).
 
 A high-performance, event-driven **market-making simulator** in Rust.
 
